@@ -1,51 +1,143 @@
 // Copyright (C) 2023, Ava Labs, Inc. All rights reserved.
 // See the file LICENSE for licensing terms.
 
-//nolint:revive
 package config
 
 import (
+	"encoding/json"
+	"fmt"
+	"strings"
 	"time"
 
+	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/logging"
 	"github.com/ava-labs/avalanchego/utils/profiler"
-	"github.com/ava-labs/avalanchego/utils/units"
-
 	"github.com/ava-labs/hypersdk/codec"
+	"github.com/ava-labs/hypersdk/config"
 	"github.com/ava-labs/hypersdk/trace"
+	"github.com/ava-labs/hypersdk/vm"
+
+	"github.com/ava-labs/hypersdk/examples/morpheusvm/consts"
+	"github.com/ava-labs/hypersdk/examples/morpheusvm/version"
 )
 
-type Config struct{}
+var _ vm.Config = (*Config)(nil)
 
-func (c *Config) GetLogLevel() logging.Level                { return logging.Info }
-func (c *Config) GetAuthVerificationCores() int             { return 1 }
-func (c *Config) GetRootGenerationCores() int               { return 1 }
-func (c *Config) GetTransactionExecutionCores() int         { return 1 }
-func (c *Config) GetStateFetchConcurrency() int             { return 1 }
-func (c *Config) GetMempoolSize() int                       { return 2_048 }
-func (c *Config) GetMempoolSponsorSize() int                { return 32 }
-func (c *Config) GetMempoolExemptSponsors() []codec.Address { return nil }
-func (c *Config) GetStreamingBacklogSize() int              { return 1024 }
-func (c *Config) GetIntermediateNodeCacheSize() int         { return 4 * units.GiB }
-func (c *Config) GetStateIntermediateWriteBufferSize() int  { return 32 * units.MiB }
-func (c *Config) GetStateIntermediateWriteBatchSize() int   { return 4 * units.MiB }
-func (c *Config) GetValueNodeCacheSize() int                { return 2 * units.GiB }
-func (c *Config) GetTraceConfig() *trace.Config             { return &trace.Config{Enabled: false} }
-func (c *Config) GetStateSyncParallelism() int              { return 4 }
-func (c *Config) GetStateSyncServerDelay() time.Duration    { return 0 } // used for testing
+const (
+	defaultContinuousProfilerFrequency = 1 * time.Minute
+	defaultContinuousProfilerMaxFiles  = 10
+	defaultStoreTransactions           = true
+)
 
-func (c *Config) GetParsedBlockCacheSize() int     { return 128 }
-func (c *Config) GetStateHistoryLength() int       { return 256 }
-func (c *Config) GetAcceptedBlockWindowCache() int { return 128 }    // 256MB at 2MB blocks
-func (c *Config) GetAcceptedBlockWindow() int      { return 50_000 } // ~3.5hr with 250ms block time (100GB at 2MB)
-func (c *Config) GetStateSyncMinBlocks() uint64    { return 768 }    // set to max int for archive nodes to ensure no skips
-func (c *Config) GetAcceptorSize() int             { return 64 }
+type Config struct {
+	*config.Config
 
-func (c *Config) GetContinuousProfilerConfig() *profiler.Config {
-	return &profiler.Config{Enabled: false}
+	// Concurrency
+	AuthVerificationCores     int `json:"authVerificationCores"`
+	RootGenerationCores       int `json:"rootGenerationCores"`
+	TransactionExecutionCores int `json:"transactionExecutionCores"`
+	StateFetchConcurrency     int `json:"stateFetchConcurrency"`
+
+	// Tracing
+	TraceEnabled    bool    `json:"traceEnabled"`
+	TraceSampleRate float64 `json:"traceSampleRate"`
+
+	// Profiling
+	ContinuousProfilerDir string `json:"continuousProfilerDir"` // "*" is replaced with rand int
+
+	// Streaming settings
+	StreamingBacklogSize int `json:"streamingBacklogSize"`
+
+	// Mempool
+	MempoolSize           int      `json:"mempoolSize"`
+	MempoolSponsorSize    int      `json:"mempoolSponsorSize"`
+	MempoolExemptSponsors []string `json:"mempoolExemptSponsors"`
+
+	// Misc
+	VerifyAuth        bool          `json:"verifyAuth"`
+	StoreTransactions bool          `json:"storeTransactions"`
+	TestMode          bool          `json:"testMode"` // makes gossip/building manual
+	LogLevel          logging.Level `json:"logLevel"`
+
+	// State Sync
+	StateSyncServerDelay time.Duration `json:"stateSyncServerDelay"` // for testing
+
+	loaded               bool
+	nodeID               ids.NodeID
+	parsedExemptSponsors []codec.Address
 }
-func (c *Config) GetVerifyAuth() bool                    { return true }
-func (c *Config) GetTargetBuildDuration() time.Duration  { return 100 * time.Millisecond }
-func (c *Config) GetProcessingBuildSkip() int            { return 16 }
-func (c *Config) GetTargetGossipDuration() time.Duration { return 20 * time.Millisecond }
-func (c *Config) GetBlockCompactionFrequency() int       { return 32 } // 64 MB of deletion if 2 MB blocks
+
+func New(nodeID ids.NodeID, b []byte) (*Config, error) {
+	c := &Config{nodeID: nodeID}
+	c.setDefault()
+	if len(b) > 0 {
+		if err := json.Unmarshal(b, c); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal config %s: %w", string(b), err)
+		}
+		c.loaded = true
+	}
+
+	// Parse any exempt sponsors (usually used when a single account is
+	// broadcasting many txs at once)
+	c.parsedExemptSponsors = make([]codec.Address, len(c.MempoolExemptSponsors))
+	for i, sponsor := range c.MempoolExemptSponsors {
+		p, err := codec.ParseAddressBech32(consts.HRP, sponsor)
+		if err != nil {
+			return nil, err
+		}
+		c.parsedExemptSponsors[i] = p
+	}
+	return c, nil
+}
+
+func (c *Config) setDefault() {
+	c.LogLevel = c.Config.GetLogLevel()
+	c.AuthVerificationCores = c.Config.GetAuthVerificationCores()
+	c.RootGenerationCores = c.Config.GetRootGenerationCores()
+	c.TransactionExecutionCores = c.Config.GetTransactionExecutionCores()
+	c.StateFetchConcurrency = c.Config.GetStateFetchConcurrency()
+	c.MempoolSize = c.Config.GetMempoolSize()
+	c.MempoolSponsorSize = c.Config.GetMempoolSponsorSize()
+	c.StateSyncServerDelay = c.Config.GetStateSyncServerDelay()
+	c.StreamingBacklogSize = c.Config.GetStreamingBacklogSize()
+	c.VerifyAuth = c.Config.GetVerifyAuth()
+	c.StoreTransactions = defaultStoreTransactions
+}
+
+func (c *Config) GetLogLevel() logging.Level                { return c.LogLevel }
+func (c *Config) GetTestMode() bool                         { return c.TestMode }
+func (c *Config) GetAuthVerificationCores() int             { return c.AuthVerificationCores }
+func (c *Config) GetRootGenerationCores() int               { return c.RootGenerationCores }
+func (c *Config) GetTransactionExecutionCores() int         { return c.TransactionExecutionCores }
+func (c *Config) GetStateFetchConcurrency() int             { return c.StateFetchConcurrency }
+func (c *Config) GetMempoolSize() int                       { return c.MempoolSize }
+func (c *Config) GetMempoolSponsorSize() int                { return c.MempoolSponsorSize }
+func (c *Config) GetMempoolExemptSponsors() []codec.Address { return c.parsedExemptSponsors }
+func (c *Config) GetTraceConfig() *trace.Config {
+	return &trace.Config{
+		Enabled:         c.TraceEnabled,
+		TraceSampleRate: c.TraceSampleRate,
+		AppName:         consts.Name,
+		Agent:           c.nodeID.String(),
+		Version:         version.Version.String(),
+	}
+}
+func (c *Config) GetStateSyncServerDelay() time.Duration { return c.StateSyncServerDelay }
+func (c *Config) GetStreamingBacklogSize() int           { return c.StreamingBacklogSize }
+func (c *Config) GetContinuousProfilerConfig() *profiler.Config {
+	if len(c.ContinuousProfilerDir) == 0 {
+		return &profiler.Config{Enabled: false}
+	}
+	// Replace all instances of "*" with nodeID. This is useful when
+	// running multiple instances of morpheusvm on the same machine.
+	c.ContinuousProfilerDir = strings.ReplaceAll(c.ContinuousProfilerDir, "*", c.nodeID.String())
+	return &profiler.Config{
+		Enabled:     true,
+		Dir:         c.ContinuousProfilerDir,
+		Freq:        defaultContinuousProfilerFrequency,
+		MaxNumFiles: defaultContinuousProfilerMaxFiles,
+	}
+}
+func (c *Config) GetVerifyAuth() bool        { return c.VerifyAuth }
+func (c *Config) GetStoreTransactions() bool { return c.StoreTransactions }
+func (c *Config) Loaded() bool               { return c.loaded }

@@ -3,30 +3,36 @@
 
 package consts
 
+import (
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/vms/platformvm/warp"
+	"github.com/ava-labs/hypersdk/chain"
+	"github.com/ava-labs/hypersdk/codec"
+	"github.com/ava-labs/hypersdk/consts"
+)
+
 const (
-	// These `codec` consts are defined here to avoid a circular dependency
-	BoolLen   = 1
-	ByteLen   = 1
-	IDLen     = 32
-	NodeIDLen = 20
-	IntLen    = 4
-	Uint8Len  = 1
-	Uint16Len = 2
-	Uint32Len = 4
-	Uint64Len = 8
-	Int64Len  = 8
+	HRP      = "morpheus"
+	Name     = "morpheusvm"
+	Symbol   = "RED"
+	Decimals = 9
+)
 
-	// AvalancheGo imposes a limit of 2 MiB on the network, so we limit at
-	// 2 MiB - ProposerVM header - Protobuf encoding overhead (we assume this is
-	// no more than 50 KiB of overhead but is likely much less)
-	NetworkSizeLimit = 2_044_723 // 1.95 MiB
+var ID ids.ID
 
-	MaxUint8              = ^uint8(0)
-	MaxUint16             = ^uint16(0)
-	MaxUint8Offset        = 7
-	MaxUint               = ^uint(0)
-	MaxInt                = int(MaxUint >> 1)
-	MaxUint64Offset       = 63
-	MaxUint64             = ^uint64(0)
-	MillisecondsPerSecond = 1000
+func init() {
+	b := make([]byte, consts.IDLen)
+	copy(b, []byte(Name))
+	vmID, err := ids.ToID(b)
+	if err != nil {
+		panic(err)
+	}
+	ID = vmID
+}
+
+// Instantiate registry here so it can be imported by any package. We set these
+// values in [controller/registry].
+var (
+	ActionRegistry *codec.TypeParser[chain.Action, *warp.Message, bool]
+	AuthRegistry   *codec.TypeParser[chain.Auth, *warp.Message, bool]
 )

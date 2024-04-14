@@ -7,34 +7,15 @@ import (
 	"context"
 
 	"github.com/ava-labs/avalanchego/ids"
-	"github.com/ava-labs/avalanchego/snow/validators"
 	"github.com/ava-labs/avalanchego/trace"
-	"github.com/ava-labs/avalanchego/utils/logging"
-	"github.com/ava-labs/avalanchego/vms/platformvm/warp"
-
-	"github.com/ava-labs/hypersdk/chain"
+	"github.com/ava-labs/hypersdk/codec"
+	"github.com/ava-labs/hypersdk/examples/morpheusvm/genesis"
 	"github.com/ava-labs/hypersdk/fees"
 )
 
-type VM interface {
-	ChainID() ids.ID
-	NetworkID() uint32
-	SubnetID() ids.ID
+type Controller interface {
+	Genesis() *genesis.Genesis
 	Tracer() trace.Tracer
-	Logger() logging.Logger
-	Registry() (chain.ActionRegistry, chain.AuthRegistry)
-	Submit(
-		ctx context.Context,
-		verifySig bool,
-		txs []*chain.Transaction,
-	) (errs []error)
-	LastAcceptedBlock() *chain.StatelessBlock
-	UnitPrices(context.Context) (fees.Dimensions, error)
-	GetOutgoingWarpMessage(ids.ID) (*warp.UnsignedMessage, error)
-	GetWarpSignatures(ids.ID) ([]*chain.WarpSignature, error)
-	CurrentValidators(
-		context.Context,
-	) (map[ids.NodeID]*validators.GetValidatorOutput, map[string]struct{})
-	GatherSignatures(context.Context, ids.ID, []byte)
-	GetVerifyAuth() bool
+	GetTransaction(context.Context, ids.ID) (bool, int64, bool, fees.Dimensions, uint64, error)
+	GetBalanceFromState(context.Context, codec.Address) (uint64, error)
 }
