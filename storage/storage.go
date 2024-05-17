@@ -17,7 +17,7 @@ import (
 	"github.com/ava-labs/hypersdk/fees"
 	"github.com/ava-labs/hypersdk/state"
 
-	mconsts "github.com/ava-labs/hypersdk/examples/morpheusvm/consts"
+	mconsts "github.com/containerman17/avalanche-polyglot-subnet/consts"
 )
 
 type ReadState func(context.Context, [][]byte) ([][]byte, []error)

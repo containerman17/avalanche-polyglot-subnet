@@ -10,13 +10,13 @@ import (
 	"github.com/ava-labs/avalanchego/ids"
 
 	"github.com/ava-labs/hypersdk/chain"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/consts"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/genesis"
-	_ "github.com/ava-labs/hypersdk/examples/morpheusvm/registry" // ensure registry populated
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/storage"
 	"github.com/ava-labs/hypersdk/requester"
 	"github.com/ava-labs/hypersdk/rpc"
 	"github.com/ava-labs/hypersdk/utils"
+	"github.com/containerman17/avalanche-polyglot-subnet/consts"
+	"github.com/containerman17/avalanche-polyglot-subnet/genesis"
+	_ "github.com/containerman17/avalanche-polyglot-subnet/registry" // ensure registry populated
+	"github.com/containerman17/avalanche-polyglot-subnet/storage"
 )
 
 type JSONRPCClient struct {

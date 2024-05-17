@@ -6,8 +6,8 @@ package genesis
 import (
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/hypersdk/chain"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/storage"
 	"github.com/ava-labs/hypersdk/fees"
+	"github.com/containerman17/avalanche-polyglot-subnet/storage"
 )
 
 var _ chain.Rules = (*Rules)(nil)

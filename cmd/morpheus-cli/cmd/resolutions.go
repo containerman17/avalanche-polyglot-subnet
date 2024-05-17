@@ -13,11 +13,11 @@ import (
 	"github.com/ava-labs/hypersdk/chain"
 	"github.com/ava-labs/hypersdk/cli"
 	"github.com/ava-labs/hypersdk/codec"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/actions"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/consts"
-	brpc "github.com/ava-labs/hypersdk/examples/morpheusvm/rpc"
 	"github.com/ava-labs/hypersdk/rpc"
 	"github.com/ava-labs/hypersdk/utils"
+	"github.com/containerman17/avalanche-polyglot-subnet/actions"
+	"github.com/containerman17/avalanche-polyglot-subnet/consts"
+	brpc "github.com/containerman17/avalanche-polyglot-subnet/rpc"
 )
 
 // sendAndWait may not be used concurrently

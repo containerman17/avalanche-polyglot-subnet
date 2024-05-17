@@ -9,9 +9,9 @@ import (
 	"github.com/ava-labs/avalanchego/ids"
 
 	"github.com/ava-labs/hypersdk/codec"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/consts"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/genesis"
 	"github.com/ava-labs/hypersdk/fees"
+	"github.com/containerman17/avalanche-polyglot-subnet/consts"
+	"github.com/containerman17/avalanche-polyglot-subnet/genesis"
 )
 
 type JSONRPCServer struct {

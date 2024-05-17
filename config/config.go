@@ -17,8 +17,8 @@ import (
 	"github.com/ava-labs/hypersdk/trace"
 	"github.com/ava-labs/hypersdk/vm"
 
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/consts"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/version"
+	"github.com/containerman17/avalanche-polyglot-subnet/consts"
+	"github.com/containerman17/avalanche-polyglot-subnet/version"
 )
 
 var _ vm.Config = (*Config)(nil)

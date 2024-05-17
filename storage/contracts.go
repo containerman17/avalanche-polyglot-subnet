@@ -8,9 +8,9 @@ import (
 	"github.com/ava-labs/avalanchego/database"
 	"github.com/ava-labs/hypersdk/codec"
 	"github.com/ava-labs/hypersdk/consts"
-	lconsts "github.com/ava-labs/hypersdk/examples/morpheusvm/consts"
 	"github.com/ava-labs/hypersdk/state"
 	"github.com/ava-labs/hypersdk/utils"
+	lconsts "github.com/containerman17/avalanche-polyglot-subnet/consts"
 )
 
 // [contractBytecodePrefix] + [address]

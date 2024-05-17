@@ -19,14 +19,14 @@ import (
 	"github.com/ava-labs/hypersdk/vm"
 	"go.uber.org/zap"
 
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/actions"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/auth"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/config"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/consts"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/genesis"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/rpc"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/storage"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/version"
+	"github.com/containerman17/avalanche-polyglot-subnet/actions"
+	"github.com/containerman17/avalanche-polyglot-subnet/auth"
+	"github.com/containerman17/avalanche-polyglot-subnet/config"
+	"github.com/containerman17/avalanche-polyglot-subnet/consts"
+	"github.com/containerman17/avalanche-polyglot-subnet/genesis"
+	"github.com/containerman17/avalanche-polyglot-subnet/rpc"
+	"github.com/containerman17/avalanche-polyglot-subnet/storage"
+	"github.com/containerman17/avalanche-polyglot-subnet/version"
 )
 
 var _ vm.Controller = (*Controller)(nil)

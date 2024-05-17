@@ -12,10 +12,10 @@ import (
 	"github.com/ava-labs/hypersdk/chain"
 	"github.com/ava-labs/hypersdk/codec"
 	"github.com/ava-labs/hypersdk/consts"
-	mconsts "github.com/ava-labs/hypersdk/examples/morpheusvm/consts"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/storage"
 	"github.com/ava-labs/hypersdk/state"
 	"github.com/ava-labs/hypersdk/utils"
+	mconsts "github.com/containerman17/avalanche-polyglot-subnet/consts"
+	"github.com/containerman17/avalanche-polyglot-subnet/storage"
 )
 
 var _ chain.Action = (*CreateContract)(nil)
@@ -61,7 +61,7 @@ func (t *CreateContract) Execute(
 		return false, 1, utils.ErrBytes(err), nil, nil
 	}
 
-	addrString := codec.MustAddressBech32(mconsts.HRP,addr)
+	addrString := codec.MustAddressBech32(mconsts.HRP, addr)
 
 	//success, computeUnits, output, warpMsg, err
 	return true, 1, []byte(addrString), nil, nil

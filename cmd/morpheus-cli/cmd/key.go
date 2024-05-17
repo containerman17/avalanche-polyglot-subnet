@@ -13,10 +13,10 @@ import (
 	"github.com/ava-labs/hypersdk/crypto/bls"
 	"github.com/ava-labs/hypersdk/crypto/ed25519"
 	"github.com/ava-labs/hypersdk/crypto/secp256r1"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/auth"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/consts"
-	brpc "github.com/ava-labs/hypersdk/examples/morpheusvm/rpc"
 	"github.com/ava-labs/hypersdk/utils"
+	"github.com/containerman17/avalanche-polyglot-subnet/auth"
+	"github.com/containerman17/avalanche-polyglot-subnet/consts"
+	brpc "github.com/containerman17/avalanche-polyglot-subnet/rpc"
 	"github.com/spf13/cobra"
 )
 

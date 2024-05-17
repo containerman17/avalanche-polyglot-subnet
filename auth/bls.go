@@ -11,8 +11,8 @@ import (
 	"github.com/ava-labs/hypersdk/codec"
 	"github.com/ava-labs/hypersdk/crypto"
 	"github.com/ava-labs/hypersdk/crypto/bls"
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/consts"
 	"github.com/ava-labs/hypersdk/utils"
+	"github.com/containerman17/avalanche-polyglot-subnet/consts"
 )
 
 var _ chain.Auth = (*BLS)(nil)

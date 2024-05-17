@@ -1,4 +1,4 @@
-module github.com/ava-labs/hypersdk/examples/morpheusvm
+module github.com/containerman17/avalanche-polyglot-subnet
 
 go 1.21
 

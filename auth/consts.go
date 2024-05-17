@@ -4,8 +4,8 @@
 package auth
 
 import (
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/consts"
 	"github.com/ava-labs/hypersdk/vm"
+	"github.com/containerman17/avalanche-polyglot-subnet/consts"
 )
 
 func Engines() map[uint8]vm.AuthEngine {

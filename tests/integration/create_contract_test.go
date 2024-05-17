@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ava-labs/hypersdk/examples/morpheusvm/actions"
+	"github.com/containerman17/avalanche-polyglot-subnet/actions"
 	"github.com/stretchr/testify/require"
 )
 
