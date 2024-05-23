@@ -1,6 +1,7 @@
 package v1javy_test
 
 //go:generate bash -c "cd assets && npm ci"
+//go:generate bash -c "cd ../v1javy/js_sdk && npm ci && chmod +x ./build.js"
 //go:generate npx ../v1javy/js_sdk/ assets/counters.ts
 
 import (
