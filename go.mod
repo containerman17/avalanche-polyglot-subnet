@@ -5,7 +5,9 @@ go 1.21
 require (
 	github.com/ava-labs/avalanchego v1.10.18
 	github.com/ava-labs/hypersdk v0.0.17-0.20240410131400-a0b658492a1e
+	github.com/bytecodealliance/wasmtime-go/v19 v19.0.0
 	github.com/fatih/color v1.13.0
+	github.com/near/borsh-go v0.3.1
 	github.com/prometheus/client_golang v1.16.0
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
